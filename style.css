@@ -38,3 +38,22 @@ li {
     padding-left: 10px;
     margin-bottom: 8px;
 }
+/* --- STIJL VOOR DE TABEL (Nieuwe sectie) --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #f0f0f0; /* Zelfde tekstkleur als body */
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #4CAF50; /* Groene randen */
+    padding: 8px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    background-color: #2a2a2a; /* Donkere achtergrond voor headers */
+    color: #4CAF50;
+}
