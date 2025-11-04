@@ -1,0 +1,40 @@
+/* Dit is het CSS-bestand voor de stijl van je website */
+
+body {
+    /* Donkere achtergrondkleur, beter voor de ogen */
+    background-color: #1a1a1a; 
+    /* Lichte tekstkleur voor contrast */
+    color: #f0f0f0; 
+    /* Een simpel, duidelijk lettertype */
+    font-family: Arial, sans-serif; 
+    /* Binnenruimte rond de inhoud */
+    padding: 20px;
+}
+
+h1 {
+    /* Een opvallende kleur voor de hoofdtitel (groen als de flare!) */
+    color: #4CAF50;
+    text-align: center; /* Titel centreren */
+    border-bottom: 2px solid #4CAF50; /* Groene lijn onder de titel */
+    padding-bottom: 10px;
+}
+
+h2 {
+    /* Iets minder opvallend, maar nog steeds groen */
+    color: #66BB6A;
+    margin-top: 30px;
+}
+
+ul {
+    /* Haalt de standaard bullet points weg */
+    list-style-type: none;
+    /* Geeft de lijst wat ruimte */
+    padding-left: 0;
+}
+
+li {
+    /* Voegt een klein bolletje toe in lichter grijs */
+    border-left: 3px solid #666;
+    padding-left: 10px;
+    margin-bottom: 8px;
+}
