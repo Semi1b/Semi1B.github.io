@@ -1,59 +1,58 @@
-/* Dit is het CSS-bestand voor de stijl van je website */
-
+/* --- HOOFDSTIJL --- */
 body {
-    /* Donkere achtergrondkleur, beter voor de ogen */
-    background-color: #1a1a1a; 
-    /* Lichte tekstkleur voor contrast */
-    color: #f0f0f0; 
-    /* Een simpel, duidelijk lettertype */
+    /* Nieuwe Navy Blauwe achtergrond (Autoriteit) */
+    background-color: #1A237E; 
+    /* Lichtere tekstkleur voor contrast */
+    color: #CCCCCC; 
     font-family: Arial, sans-serif; 
-    /* Binnenruimte rond de inhoud */
     padding: 20px;
 }
 
 h1 {
-    /* Een opvallende kleur voor de hoofdtitel (groen als de flare!) */
-    color: #4CAF50;
-    text-align: center; /* Titel centreren */
-    border-bottom: 2px solid #4CAF50; /* Groene lijn onder de titel */
+    /* Gouden kleur voor de hoofdtitel (Rang/Status) */
+    color: #FFC107;
+    text-align: center;
+    /* Licht Gouden lijn onder de titel */
+    border-bottom: 2px solid #FFD54F; 
     padding-bottom: 10px;
 }
 
-h2 {
-    /* Iets minder opvallend, maar nog steeds groen */
-    color: #66BB6A;
+h2, h3, h4 {
+    /* Goud voor alle sectie-titels */
+    color: #FFC107; 
     margin-top: 30px;
 }
 
 ul {
-    /* Haalt de standaard bullet points weg */
     list-style-type: none;
-    /* Geeft de lijst wat ruimte */
     padding-left: 0;
 }
 
 li {
-    /* Voegt een klein bolletje toe in lichter grijs */
-    border-left: 3px solid #666;
+    /* Licht Goud als rand voor lijstitems */
+    border-left: 3px solid #FFD54F;
     padding-left: 10px;
     margin-bottom: 8px;
 }
-/* --- STIJL VOOR DE TABEL (Nieuwe sectie) --- */
+
+/* --- STIJL VOOR DE TABEL --- */
 table {
     width: 100%;
     border-collapse: collapse;
-    color: #f0f0f0; /* Zelfde tekstkleur als body */
+    color: #CCCCCC;
     margin-top: 15px;
 }
 
 th, td {
-    border: 1px solid #4CAF50; /* Groene randen */
+    /* Licht Gouden randen voor de tabel */
+    border: 1px solid #FFD54F; 
     padding: 8px;
     text-align: left;
     vertical-align: middle;
 }
 
 th {
-    background-color: #2a2a2a; /* Donkere achtergrond voor headers */
-    color: #4CAF50;
+    /* Donkerdere achtergrond voor tabel headers */
+    background-color: #0D1350; 
+    color: #FFC107;
 }
