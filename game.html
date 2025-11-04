@@ -1,25 +1,3 @@
-<script>
-        let score = 0;
-        const gameArea = document.getElementById('game-area');
-        const scoreDisplay = document.getElementById('score');
-
-        // Wanneer je op de game-area klikt
-        gameArea.addEventListener('click', function() {
-            score += 1; // Tel de score op
-            scoreDisplay.innerText = score;
-            gameArea.style.backgroundColor = 'rgba(255, 209, 0, 0.2)'; // Licht geel flits
-
-            // Haal de kleur na korte tijd weer weg
-            setTimeout(() => {
-                gameArea.style.backgroundColor = 'transparent';
-            }, 100);
-        });
-
-        document.getElementById('status').innerText = 'Klik nu om punten te scoren!';
-    </script>
-
-    <footer>
-        <p>Gepubliceerd via GitHub Pages.</p>
-    </footer>
-</body>
-</html>
+<div id="game-area" style="border: 2px solid #FFC107; height: 400px; margin: 20px auto; position: relative; overflow: hidden;">
+    <div id="player" style="position: absolute; width: 30px; height: 30px; background-color: #388E3C; top: 180px; left: 285px;"></div>
+</div>
