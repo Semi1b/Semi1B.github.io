@@ -1,10 +1,16 @@
+/* Importeer het strakke lettertype 'Open Sans' van Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
 /* --- HOOFDSTIJL --- */
 body {
-    /* Nieuwe Navy Blauwe achtergrond (Autoriteit) */
+    /* Navy Blauwe achtergrond (Autoriteit) */
     background-color: #1A237E; 
     /* Lichtere tekstkleur voor contrast */
     color: #CCCCCC; 
-    font-family: Arial, sans-serif; 
+    /* Gebruik het nieuwe strakke lettertype */
+    font-family: 'Open Sans', sans-serif; 
+    /* Verhoog de afstand tussen de tekstregels (professioneler) */
+    line-height: 1.6;
     padding: 20px;
 }
 
@@ -12,6 +18,8 @@ h1 {
     /* Gouden kleur voor de hoofdtitel (Rang/Status) */
     color: #FFC107;
     text-align: center;
+    /* Extra ruimte tussen letters voor een strakkere look */
+    letter-spacing: 2px;
     /* Licht Gouden lijn onder de titel */
     border-bottom: 2px solid #FFD54F; 
     padding-bottom: 10px;
@@ -21,6 +29,8 @@ h2, h3, h4 {
     /* Goud voor alle sectie-titels */
     color: #FFC107; 
     margin-top: 30px;
+    /* Iets meer letterspatie voor de titels */
+    letter-spacing: 1px;
 }
 
 ul {
@@ -41,6 +51,8 @@ table {
     border-collapse: collapse;
     color: #CCCCCC;
     margin-top: 15px;
+    /* Minder ruimte in de tabel om het compact te houden */
+    line-height: 1.4;
 }
 
 th, td {
