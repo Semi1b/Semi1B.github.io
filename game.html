@@ -1,3 +1,104 @@
 <div id="game-area" style="border: 2px solid #FFC107; height: 400px; margin: 20px auto; position: relative; overflow: hidden;">
     <div id="player" style="position: absolute; width: 30px; height: 30px; background-color: #388E3C; top: 180px; left: 285px;"></div>
 </div>
+
+<div id="controls" style="text-align: center; margin-top: 10px;">
+    <button onmousedown="movePlayer('up')" ontouchstart="movePlayer('up')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; display: block; margin: 0 auto 5px;">▲</button>
+    <div style="display: flex; justify-content: center;">
+        <button onmousedown="movePlayer('left')" ontouchstart="movePlayer('left')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; margin-right: 5px;">◀</button>
+        <button onmousedown="movePlayer('down')" ontouchstart="movePlayer('down')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; margin-right: 5px;">▼</button>
+        <button onmousedown="movePlayer('right')" ontouchstart="movePlayer('right')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none;">▶</button>
+    </div>
+</div>
+<script>
+    const player = document.getElementById('player');
+    let playerX = 285;
+    let playerY = 180;
+    const speed = 3; // Lagere snelheid voor vloeiendere continue beweging
+    let currentDirection = null;
+    let gameLoop;
+    const gameAreaWidth = 600; // De breedte van de game-area (zoals ingesteld in HTML)
+    const gameAreaHeight = 400; // De hoogte van de game-area
+    const playerSize = 30;
+
+    // Functie om de positie van de speler bij te werken
+    function updatePlayerPosition() {
+        player.style.left = playerX + 'px';
+        player.style.top = playerY + 'px';
+    }
+
+    // De continue bewegingslus
+    function gameTick() {
+        if (currentDirection) {
+            switch(currentDirection) {
+                case 'up':
+                    playerY -= speed;
+                    break;
+                case 'down':
+                    playerY += speed;
+                    break;
+                case 'left':
+                    playerX -= speed;
+                    break;
+                case 'right':
+                    playerX += speed;
+                    break;
+            }
+        }
+
+        // Zorgen dat de speler in het speelveld blijft
+        playerX = Math.max(0, Math.min(playerX, gameAreaWidth - playerSize));
+        playerY = Math.max(0, Math.min(playerY, gameAreaHeight - playerSize));
+
+        updatePlayerPosition();
+    }
+
+    // Start de continue lus (ongeveer 60 keer per seconde)
+    gameLoop = setInterval(gameTick, 1000 / 60); 
+
+    // 1. Toetsenbord Functies (keydown/keyup)
+    document.addEventListener('keydown', function(event) {
+        // Zorg ervoor dat de speler niet stopt met bewegen als je meerdere toetsen indrukt
+        if (currentDirection) return; 
+
+        switch(event.key.toLowerCase()) {
+            case 'arrowup': case 'w': currentDirection = 'up'; break;
+            case 'arrowdown': case 's': currentDirection = 'down'; break;
+            case 'arrowleft': case 'a': currentDirection = 'left'; break;
+            case 'arrowright': case 'd': currentDirection = 'right'; break;
+        }
+    });
+
+    document.addEventListener('keyup', function(event) {
+        let releasedKey = event.key.toLowerCase();
+        let releasedDirection;
+
+        switch(releasedKey) {
+            case 'arrowup': case 'w': releasedDirection = 'up'; break;
+            case 'arrowdown': case 's': releasedDirection = 'down'; break;
+            case 'arrowleft': case 'a': releasedDirection = 'left'; break;
+            case 'arrowright': case 'd': releasedDirection = 'right'; break;
+        }
+
+        // Stop alleen als de losgelaten toets overeenkomt met de huidige beweging
+        if (currentDirection === releasedDirection) {
+            currentDirection = null;
+        }
+    });
+
+    // 2. Mobiele Knoppen Functies (onmousedown/ontouchstart)
+    function movePlayer(direction) {
+        currentDirection = direction;
+    }
+
+    function stopPlayer() {
+        currentDirection = null;
+    }
+
+    // Zorg ervoor dat de functies beschikbaar zijn voor de HTML knoppen
+    window.movePlayer = movePlayer;
+    window.stopPlayer = stopPlayer;
+
+
+    updatePlayerPosition();
+</script>
