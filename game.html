@@ -1,104 +1,95 @@
-<div id="game-area" style="border: 2px solid #FFC107; height: 400px; margin: 20px auto; position: relative; overflow: hidden;">
-    <div id="player" style="position: absolute; width: 30px; height: 30px; background-color: #388E3C; top: 180px; left: 285px;"></div>
-</div>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Mijn Minecraft/Terraria Webgame</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <hr>
+    
+    <h1>⛏️ Minecraft/Terraria Style Game</h1>
+    <p>Welkom in jouw 2D wereld! Gebruik W/A/D of de knoppen om te bewegen en springen.</p>
 
-<div id="controls" style="text-align: center; margin-top: 10px;">
-    <button onmousedown="movePlayer('up')" ontouchstart="movePlayer('up')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; display: block; margin: 0 auto 5px;">▲</button>
-    <div style="display: flex; justify-content: center;">
-        <button onmousedown="movePlayer('left')" ontouchstart="movePlayer('left')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; margin-right: 5px;">◀</button>
-        <button onmousedown="movePlayer('down')" ontouchstart="movePlayer('down')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; margin-right: 5px;">▼</button>
-        <button onmousedown="movePlayer('right')" ontouchstart="movePlayer('right')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none;">▶</button>
-    </div>
-</div>
-<script>
-    const player = document.getElementById('player');
-    let playerX = 285;
-    let playerY = 180;
-    const speed = 3; // Lagere snelheid voor vloeiendere continue beweging
-    let currentDirection = null;
-    let gameLoop;
-    const gameAreaWidth = 600; // De breedte van de game-area (zoals ingesteld in HTML)
-    const gameAreaHeight = 400; // De hoogte van de game-area
-    const playerSize = 30;
+    <div id="game-area" style="border: 2px solid #FFC107; height: 400px; width: 600px; margin: 20px auto; position: relative; overflow: hidden; background-color: #79a6d9;">
+        <div id="player" style="position: absolute; width: 30px; height: 30px; background-color: #388E3C; top: 0px; left: 0px;"></div>
+        </div>
+    
+    <div id="controls" style="text-align: center; margin-top: 10px;">
+        <button onclick="jump()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; display: block; margin: 0 auto 5px; font-weight: bold; cursor: pointer;">▲ Springen</button>
+        <div style="display: flex; justify-content: center;">
+            <button onmousedown="movePlayer('left')" ontouchstart="movePlayer('left')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; margin-right: 5px; font-weight: bold; cursor: pointer;">◀ Links</button>
+            <button onmousedown="movePlayer('right')" ontouchstart="movePlayer('right')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 60px; height: 30px; background-color: #FFC107; color: #1A237E; border: none; font-weight: bold; cursor: pointer;">▶ Rechts</button>
+        </div>
+        </div>
 
-    // Functie om de positie van de speler bij te werken
-    function updatePlayerPosition() {
-        player.style.left = playerX + 'px';
-        player.style.top = playerY + 'px';
-    }
+    <script>
+        const player = document.getElementById('player');
+        const gameArea = document.getElementById('game-area');
+        const tileSize = 30; // Blokken en speler zijn 30x30 pixels
+        
+        // De wereldkaart. 0 = lucht, 1 = gras/aarde, 2 = steen (nieuwe toevoeging)
+        // De game-area is 600px breed (20 kolommen) en 400px hoog (13 rijen).
+        const world = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Rij 1
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], // Een grasplatform
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], // Een stenen platform
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // De grond (gras)
+        ];
 
-    // De continue bewegingslus
-    function gameTick() {
-        if (currentDirection) {
-            switch(currentDirection) {
-                case 'up':
-                    playerY -= speed;
-                    break;
-                case 'down':
-                    playerY += speed;
-                    break;
-                case 'left':
-                    playerX -= speed;
-                    break;
-                case 'right':
-                    playerX += speed;
-                    break;
+        let playerX = tileSize * 2; // Startpositie X
+        let playerY = 0; // Startpositie Y (Bovenin)
+        let velocityY = 0; // Verticale snelheid (voor zwaartekracht/springen)
+        const gravity = 1; 
+        const jumpPower = -15; 
+        const moveSpeed = 5;
+        let currentDirection = null;
+        let isJumping = false;
+        let gameLoop;
+        const playerSize = tileSize;
+
+
+        // --- FUNCTIES VOOR DE WERELD ---
+
+        // Teken alle blokken in de wereld
+        function drawWorld() {
+            // Verwijder alleen de oude tegels, houd de speler en knoppen
+            // Dit is cruciaal om te voorkomen dat de speler verdwijnt.
+            document.querySelectorAll('.tile').forEach(tile => tile.remove()); 
+            
+            for (let y = 0; y < world.length; y++) {
+                for (let x = 0; x < world[y].length; x++) {
+                    const blockType = world[y][x];
+                    if (blockType > 0) { // Alleen tekenen als het geen lucht is (0)
+                        const block = document.createElement('div');
+                        block.className = 'tile';
+                        block.style.position = 'absolute';
+                        block.style.width = tileSize + 'px';
+                        block.style.height = tileSize + 'px';
+                        block.style.left = (x * tileSize) + 'px';
+                        block.style.top = (y * tileSize) + 'px';
+                        block.style.border = '1px solid #1B5E20';
+                        
+                        // Kleur bepalen op basis van bloktype
+                        if (blockType === 1) { // Gras
+                            block.style.backgroundColor = '#388E3C'; 
+                        } else if (blockType === 2) { // Steen (Nieuwe kleur)
+                            block.style.backgroundColor = '#607D8B'; 
+                            block.style.border = '1px solid #455A64';
+                        }
+
+                        gameArea.appendChild(block);
+                    }
+                }
             }
         }
 
-        // Zorgen dat de speler in het speelveld blijft
-        playerX = Math.max(0, Math.min(playerX, gameAreaWidth - playerSize));
-        playerY = Math.max(0, Math.min(playerY, gameAreaHeight - playerSize));
-
-        updatePlayerPosition();
-    }
-
-    // Start de continue lus (ongeveer 60 keer per seconde)
-    gameLoop = setInterval(gameTick, 1000 / 60); 
-
-    // 1. Toetsenbord Functies (keydown/keyup)
-    document.addEventListener('keydown', function(event) {
-        // Zorg ervoor dat de speler niet stopt met bewegen als je meerdere toetsen indrukt
-        if (currentDirection) return; 
-
-        switch(event.key.toLowerCase()) {
-            case 'arrowup': case 'w': currentDirection = 'up'; break;
-            case 'arrowdown': case 's': currentDirection = 'down'; break;
-            case 'arrowleft': case 'a': currentDirection = 'left'; break;
-            case 'arrowright': case 'd': currentDirection = 'right'; break;
-        }
-    });
-
-    document.addEventListener('keyup', function(event) {
-        let releasedKey = event.key.toLowerCase();
-        let releasedDirection;
-
-        switch(releasedKey) {
-            case 'arrowup': case 'w': releasedDirection = 'up'; break;
-            case 'arrowdown': case 's': releasedDirection = 'down'; break;
-            case 'arrowleft': case 'a': releasedDirection = 'left'; break;
-            case 'arrowright': case 'd': releasedDirection = 'right'; break;
-        }
-
-        // Stop alleen als de losgelaten toets overeenkomt met de huidige beweging
-        if (currentDirection === releasedDirection) {
-            currentDirection = null;
-        }
-    });
-
-    // 2. Mobiele Knoppen Functies (onmousedown/ontouchstart)
-    function movePlayer(direction) {
-        currentDirection = direction;
-    }
-
-    function stopPlayer() {
-        currentDirection = null;
-    }
-
-    // Zorg ervoor dat de functies beschikbaar zijn voor de HTML knoppen
-    window.movePlayer = movePlayer;
-    window.stopPlayer = stopPlayer;
-
-
-    updatePlayerPosition();
-</script>
+        // Controleer op botsingen met de blokken (vereenvoudigde
