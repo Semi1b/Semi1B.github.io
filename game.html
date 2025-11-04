@@ -1,25 +1,21 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <title>Mijn Eerste Webgame - NBTF</title>
-    <link rel="stylesheet" href="style.css"> 
-</head>
-<body>
-    <hr>
+<script>
+        let score = 0;
+        const gameArea = document.getElementById('game-area');
+        const scoreDisplay = document.getElementById('score');
 
-    <h1>💥 NBTF Verdedigingsgame!</h1>
-    <p>Klik op de rebellen voordat ze de basis bereiken. Jouw rol: **Secretary of Defense**!</p>
+        // Wanneer je op de game-area klikt
+        gameArea.addEventListener('click', function() {
+            score += 1; // Tel de score op
+            scoreDisplay.innerText = score;
+            gameArea.style.backgroundColor = 'rgba(255, 209, 0, 0.2)'; // Licht geel flits
 
-    <div id="game-area" style="border: 2px solid #FFC107; height: 400px; margin: 20px auto; position: relative;">
-        <p style="text-align: center; margin-top: 180px;">Laden van het spel...</p>
-    </div>
+            // Haal de kleur na korte tijd weer weg
+            setTimeout(() => {
+                gameArea.style.backgroundColor = 'transparent';
+            }, 100);
+        });
 
-    <p>Status: <span id="status">Wacht op start...</span> | Score: <span id="score">0</span></p>
-
-    <script>
-        // Hier komt de magie van het spel (Stap 2)
-        document.getElementById('status').innerText = 'Klaar om te beginnen!';
+        document.getElementById('status').innerText = 'Klik nu om punten te scoren!';
     </script>
 
     <footer>
