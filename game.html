@@ -1,168 +1,267 @@
-<script>
-    const player = document.getElementById('player');
-    const gameArea = document.getElementById('game-area');
-    const tileSize = 30; // Blokken en speler zijn 30x30 pixels
-
-    // De wereldkaart. 0 = lucht, 1 = gras/aarde, 2 = steen
-    // De game-area is 600px breed (20 kolommen) en 400px hoog (13 rijen).
-    const world = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], // Een grasplatform
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], // Een stenen platform
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // De grond (gras)
-    ];
-
-    let playerX = tileSize * 2; // Startpositie X
-    let playerY = 0; // Startpositie Y (Bovenin)
-    let velocityY = 0; // Verticale snelheid (voor zwaartekracht/springen)
-    const gravity = 1; 
-    const jumpPower = -15; 
-    const moveSpeed = 5;
-    let currentDirection = null; // 'left' of 'right'
-    let isJumping = false;
-    let isOnGround = false; // Nieuwe vlag voor zwaartekracht
-    const playerSize = tileSize;
-
-    // --- FUNCTIES VOOR DE WERELD ---
-
-    // Teken alle blokken in de wereld (De code die je al had)
-    function drawWorld() {
-        // Verwijder alleen de oude tegels
-        document.querySelectorAll('.tile').forEach(tile => tile.remove()); 
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mijn Minecraft/Terraria Webgame</title>
+    
+    <style>
+        /* CSS voor de styling die je in style.css wilde zetten */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #1A237E;
+            text-align: center;
+        }
         
-        for (let y = 0; y < world.length; y++) {
-            for (let x = 0; x < world[y].length; x++) {
-                const blockType = world[y][x];
-                if (blockType > 0) {
-                    const block = document.createElement('div');
-                    block.className = 'tile';
-                    block.style.position = 'absolute';
-                    block.style.width = tileSize + 'px';
-                    block.style.height = tileSize + 'px';
-                    block.style.left = (x * tileSize) + 'px';
-                    block.style.top = (y * tileSize) + 'px';
-                    block.style.border = '1px solid'; // Algemene rand
+        h1 {
+            color: #1A237E;
+            margin-top: 20px;
+        }
 
-                    // Kleur bepalen op basis van bloktype
-                    if (blockType === 1) { // Gras
-                        block.style.backgroundColor = '#388E3C'; 
-                        block.style.borderColor = '#1B5E20';
-                    } else if (blockType === 2) { // Steen
-                        block.style.backgroundColor = '#607D8B'; 
-                        block.style.borderColor = '#455A64';
+        #game-area {
+            border: 4px solid #FFC107; /* Een dikkere, opvallende rand */
+            height: 400px; 
+            width: 600px; 
+            margin: 20px auto; 
+            position: relative; 
+            overflow: hidden; 
+            background-color: #79a6d9; /* Lucht / Blauwe achtergrond */
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        #player {
+            position: absolute; 
+            width: 30px; 
+            height: 30px; 
+            background-color: #388E3C; 
+            transition: background-color 0.1s; /* Vloeiendere kleurwissel */
+        }
+
+        .controls button {
+            transition: background-color 0.1s;
+        }
+        
+        .controls button:active {
+             background-color: #ff9800 !important; /* Klik-effect */
+        }
+
+    </style>
+</head>
+<body>
+    <hr>
+    
+    <h1>⛏️ Minecraft/Terraria Style Game</h1>
+    <p>Welkom in jouw 2D wereld! Gebruik **W/A/D** (of de spatiebalk) of de knoppen om te bewegen en springen.</p>
+
+    <div id="game-area">
+        <div id="player"></div>
+    </div>
+    
+    <div id="controls" class="controls" style="text-align: center; margin-top: 10px;">
+        <button onclick="jump()" style="width: 80px; height: 35px; background-color: #FFC107; color: #1A237E; border: none; display: block; margin: 0 auto 10px; font-weight: bold; cursor: pointer; border-radius: 5px;">▲ Springen</button>
+        <div style="display: flex; justify-content: center;">
+            <button onmousedown="movePlayer('left')" ontouchstart="movePlayer('left')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 80px; height: 35px; background-color: #FFC107; color: #1A237E; border: none; margin-right: 10px; font-weight: bold; cursor: pointer; border-radius: 5px;">◀ Links</button>
+            <button onmousedown="movePlayer('right')" ontouchstart="movePlayer('right')" ontouchend="stopPlayer()" onmouseup="stopPlayer()" style="width: 80px; height: 35px; background-color: #FFC107; color: #1A237E; border: none; font-weight: bold; cursor: pointer; border-radius: 5px;">▶ Rechts</button>
+        </div>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const gameArea = document.getElementById('game-area');
+        const tileSize = 30; // Blokken en speler zijn 30x30 pixels
+        
+        // De wereldkaart. 0 = lucht, 1 = gras/aarde, 2 = steen
+        const world = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], // Grasplatform
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], // Stenen platform
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // De grond
+        ];
+
+        let playerX = tileSize * 2; 
+        let playerY = 0; 
+        let velocityY = 0; 
+        const gravity = 1; 
+        const jumpPower = -15; 
+        const moveSpeed = 5;
+        let currentDirection = null; 
+        let isOnGround = false; 
+        const playerSize = tileSize;
+
+        // Teken alle blokken in de wereld
+        function drawWorld() {
+            document.querySelectorAll('.tile').forEach(tile => tile.remove()); 
+            
+            for (let y = 0; y < world.length; y++) {
+                for (let x = 0; x < world[y].length; x++) {
+                    const blockType = world[y][x];
+                    if (blockType > 0) {
+                        const block = document.createElement('div');
+                        block.className = 'tile';
+                        block.style.position = 'absolute';
+                        block.style.width = tileSize + 'px';
+                        block.style.height = tileSize + 'px';
+                        block.style.left = (x * tileSize) + 'px';
+                        block.style.top = (y * tileSize) + 'px';
+                        block.style.border = '1px solid';
+
+                        if (blockType === 1) { // Gras
+                            block.style.backgroundColor = '#388E3C'; 
+                            block.style.borderColor = '#1B5E20';
+                        } else if (blockType === 2) { // Steen
+                            block.style.backgroundColor = '#607D8B'; 
+                            block.style.borderColor = '#455A64';
+                        }
+
+                        gameArea.appendChild(block);
                     }
-
-                    gameArea.appendChild(block);
                 }
             }
         }
-    }
 
-    // Controleer of de gegeven (x, y) coördinaat van een tegel een vast blok is.
-    function isSolid(tileX, tileY) {
-        if (tileY < 0 || tileY >= world.length || tileX < 0 || tileX >= world[0].length) {
-            return false; // Buiten de grenzen van de wereld
+        // Controleer of de tegel een vast blok is
+        function isSolid(tileX, tileY) {
+            if (tileY < 0 || tileY >= world.length || tileX < 0 || tileX >= world[0].length) {
+                return false; 
+            }
+            return world[tileY][tileX] > 0;
         }
-        return world[tileY][tileX] > 0;
-    }
 
-    // --- FUNCTIES VOOR DE SPELER ---
+        // Controleer op botsingen
+        function checkCollision(x, y) {
+            const leftTile = Math.floor(x / tileSize);
+            const rightTile = Math.floor((x + playerSize - 1) / tileSize); 
+            const topTile = Math.floor(y / tileSize);
+            const bottomTile = Math.floor((y + playerSize - 1) / tileSize);
 
-    // Controleer op botsingen (De code die je was begonnen, maar nu afgemaakt)
-    function checkCollision(x, y) {
-        // Bereken welke tegels de speler overlapt of raakt
-        const leftTile = Math.floor(x / tileSize);
-        const rightTile = Math.floor((x + playerSize - 1) / tileSize); // -1 voor de rand
-        const topTile = Math.floor(y / tileSize);
-        const bottomTile = Math.floor((y + playerSize) / tileSize);
+            // Verticale botsing (Controleer de tegel direct onder de speler)
+            const tileUnderPlayer = Math.floor((y + playerSize + 1) / tileSize);
+            isOnGround = isSolid(leftTile, tileUnderPlayer - 1) || isSolid(rightTile, tileUnderPlayer - 1);
+            
+            return {
+                bottom: isSolid(leftTile, bottomTile) || isSolid(rightTile, bottomTile),
+                top: isSolid(leftTile, topTile) || isSolid(rightTile, topTile),
+                left: isSolid(leftTile, topTile) || isSolid(leftTile, bottomTile),
+                right: isSolid(rightTile, topTile) || isSolid(rightTile, bottomTile),
+                groundY: isOnGround ? (tileUnderPlayer - 1) * tileSize : null 
+            };
+        }
 
-        // Horizontale botsing (alleen nodig als de speler beweegt, maar controleren we nu preventief)
-        for (let row = topTile; row <= bottomTile; row++) {
-            if (isSolid(leftTile, row) || isSolid(rightTile, row)) {
-                // We behandelen horizontale botsingen in de gameUpdate functie
-                // Deze functie focus nu vooral op of er iets onder de speler is (isOnGround).
-                // Om de code simpel te houden, richten we ons primair op verticale botsingen (vloer/plafond).
+        // Speler springen
+        function jump() {
+            if (isOnGround) {
+                velocityY = jumpPower;
+                isOnGround = false; 
+                player.style.backgroundColor = '#1A237E'; // Blauw tijdens het springen 
             }
         }
 
-        // Verticale botsing (Controleer de tegel direct onder de speler voor de 'grond')
-        // We controleren de tegel een pixel onder de huidige positie
-        const tileUnderPlayer = Math.floor((y + playerSize + 1) / tileSize);
-        
-        // Controleer of de speler op *een* vast blok staat (links of rechts onder)
-        isOnGround = isSolid(leftTile, tileUnderPlayer - 1) || isSolid(rightTile, tileUnderPlayer - 1);
-        
-        return {
-            bottom: isSolid(leftTile, bottomTile) || isSolid(rightTile, bottomTile),
-            top: isSolid(leftTile, topTile) || isSolid(rightTile, topTile),
-            left: isSolid(leftTile, topTile) || isSolid(leftTile, bottomTile - 1), // -1 voor de hoek
-            right: isSolid(rightTile, topTile) || isSolid(rightTile, bottomTile - 1),
-            // Een simplistische manier om *één* van de tegels onder de speler te vinden
-            groundY: isOnGround ? (tileUnderPlayer - 1) * tileSize : null 
-        };
-    }
-
-    // Speler springen
-    function jump() {
-        // Alleen springen als de speler op de grond staat
-        if (isOnGround) {
-            velocityY = jumpPower;
-            isOnGround = false; // Je bent nu in de lucht!
-            // Emoei toevoegen!
-            player.style.backgroundColor = '#1A237E'; // Even een blauwe kleur tijdens het springen 💙
-        }
-    }
-
-    // Speler bewegen (ingedrukt houden)
-    function movePlayer(direction) {
-        currentDirection = direction;
-    }
-
-    // Speler stoppen (loslaten)
-    function stopPlayer() {
-        currentDirection = null;
-    }
-    
-    // De hoofd-gamelus (loopt constant)
-    function gameUpdate() {
-        // 1. Horizontale beweging
-        let newX = playerX;
-        if (currentDirection === 'left') {
-            newX = playerX - moveSpeed;
-        } else if (currentDirection === 'right') {
-            newX = playerX + moveSpeed;
+        // Speler bewegen (ingedrukt houden)
+        function movePlayer(direction) {
+            currentDirection = direction;
         }
 
-        // Blijf binnen de game-area (600px breed)
-        if (newX >= 0 && newX + playerSize <= 600) {
-            // Voer een voorlopige botsingscheck uit voor de nieuwe X-positie
-            const collision = checkCollision(newX, playerY);
-
-            // Controleer op horizontale botsing met blokken
-            if ((currentDirection === 'left' && !collision.left) || (currentDirection === 'right' && !collision.right)) {
-                 playerX = newX;
-            } 
-            // Een meer geavanceerde check zou hier nodig zijn om de speler netjes tegen de rand van het blok te plaatsen.
-            // Voor nu houden we het simpel: als je op een blok botst, beweeg je niet.
+        // Speler stoppen (loslaten)
+        function stopPlayer() {
+            currentDirection = null;
         }
         
-        // 2. Verticale beweging (Zwaartekracht & Sprongen)
-        
-        // Pas zwaartekracht toe
-        velocityY += gravity;
-        
-        // Beperk verticale snelheid (max. val)
-        if (velocityY > tileSize) velocityY = tileSize;
-        
-        let newY = playerY + velocityY;
+        // De hoofd-gamelus
+        function gameUpdate() {
+            // 1. Horizontale beweging
+            let newX = playerX;
+            if (currentDirection === 'left') {
+                newX = playerX - moveSpeed;
+            } else if (currentDirection === 'right') {
+                newX = playerX + moveSpeed;
+            }
 
-        // Blijf binnen de game-area (400px hoog)
-        if (newY + playerSize >= 400) {
+            // Blijf binnen de game-area
+            if (newX >= 0 && newX + playerSize <= 600) {
+                const collision = checkCollision(newX, playerY);
+                // Controleer op horizontale botsing
+                if ((currentDirection === 'left' && !collision.left) || (currentDirection === 'right' && !collision.right)) {
+                     playerX = newX;
+                } else if (currentDirection === 'left' && collision.left) {
+                     playerX = (Math.floor(playerX / tileSize) + 1) * tileSize; // Plaats rechts van het blok
+                } else if (currentDirection === 'right' && collision.right) {
+                     playerX = (Math.floor(playerX / tileSize) * tileSize) - playerSize; // Plaats links van het blok
+                }
+            }
+            
+            // 2. Verticale beweging (Zwaartekracht & Sprongen)
+            velocityY += gravity;
+            if (velocityY > tileSize) velocityY = tileSize;
+            let newY = playerY + velocityY;
+
+            // Controleer botsing met de onderkant van de game-area (de bodem)
+            if (newY + playerSize >= 400) { 
+                newY = 400 - playerSize;
+                velocityY = 0;
+                isOnGround = true;
+            } else {
+                // Controleer op botsing met de wereldblokken
+                const collision = checkCollision(playerX, newY);
+                
+                if (collision.bottom && velocityY > 0) { // Botsing met de grond tijdens vallen
+                    if (collision.groundY !== null) {
+                        newY = collision.groundY - playerSize; 
+                    } else {
+                        newY = Math.floor(newY / tileSize) * tileSize - playerSize;
+                    }
+                    velocityY = 0;
+                    isOnGround = true;
+                } 
+                
+                if (collision.top && velocityY < 0) { // Botsing met het plafond tijdens springen
+                    velocityY = 0; 
+                    newY = Math.floor(newY / tileSize) * tileSize + tileSize; 
+                }
+            }
+
+            // Update de speler positie en status
+            playerY = newY;
+            player.style.left = playerX + 'px';
+            player.style.top = playerY + 'px';
+            
+            if (isOnGround) {
+                player.style.backgroundColor = '#388E3C'; // Groene kleur
+            }
+
+            requestAnimationFrame(gameUpdate);
+        }
+        
+        // Toetsenbord bediening
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'a' || e.key === 'A') {
+                movePlayer('left');
+            } else if (e.key === 'd' || e.key === 'D') {
+                movePlayer('right');
+            } else if ((e.key === 'w' || e.key === 'W' || e.key === ' ') && isOnGround) {
+                jump();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if ((e.key === 'a' || e.key === 'A') && currentDirection === 'left') {
+                stopPlayer();
+            } else if ((e.key === 'd' || e.key === 'D') && currentDirection === 'right') {
+                stopPlayer();
+            }
+        });
+
+        // Start de wereld en de game-loop
+        drawWorld();
+        gameUpdate(); 
+    </script>
+</body>
+</html>
